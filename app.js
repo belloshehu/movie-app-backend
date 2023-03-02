@@ -1,23 +1,39 @@
 require('dotenv').config()
+require('express-async-errors')
 const connectDB = require('./database/connect')
 const express = require('express')
 const cors = require('cors')
 const cookieSession = require('cookie-session')
+
 const passport = require('passport')
-const passportSetup = require('./passport')
+// const passportSetup = require('./passport')
+const passportSetupStrategy = require('./passport-google')
 const authRouter = require('./routers/authRouter')
+const errorHandlerMiddleware = require('./middleware/error-handler')
+const notFoundMiddleware = require('./middleware/not-found')
 
 const app  = express()
-
 app.use(cookieSession({name: 'session', keys: [process.env.SESSION_KEY] ,maxAge: 24 * 60 * 60 * 1000}))
 app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true,
     methods: 'GET,PUT,POST,PATCH'
 }))
+
+// set encoding middleware
+app.use(express.json())
+app.use(express.static('public'))
+app.use(express.urlencoded({extended: false}))
+
 app.use(passport.initialize())
 app.use(passport.session())
+
+// routers
 app.use('/auth', authRouter)
+
+// other middlewares
+app.use(errorHandlerMiddleware)
+app.use(notFoundMiddleware)
 
 const mongoURI = process.env.MONGO_URI
 
