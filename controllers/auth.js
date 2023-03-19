@@ -5,7 +5,6 @@ const User = require('../models/auth')
 
 const localLogin = async(req, res)=>{
     const {email, password} = req.body
-    
     if(!email && !password){
         throw new BadRequestError('Please provide email and password')
     }
@@ -18,12 +17,28 @@ const localLogin = async(req, res)=>{
     if(!user.password){
         throw new UnauthenticatedError('Password is incorrect')
     }
+
     const isMatch = await user.comparePassword(password)
-    console.log(typeof password)
+
     if(!isMatch){
         throw new UnauthenticatedError('Password is incorrect')
     }
-    res.status(StatusCodes.OK).json({user, message: 'success', success: true })
+    res.status(StatusCodes.OK).json({user, message: 'success', success: true, token: user.getJWT() })
 }
 
-module.exports = {localLogin}
+
+const localSignup = async(req, res) =>{
+    const {email, username, password} = req.body
+    if(!email || !username || !password){
+        throw new BadRequestError('Please provide email, username and password')
+    }
+
+    const existingUser = await User.findOne({email})
+    if(existingUser){
+        throw new BadRequestError(`User with ${email} exists`)
+    }
+
+    const user = await User.create({email, username, password})
+    res.status(StatusCodes.CREATED).json({user, message: 'Sign up successfully', token: user.getJWT()})
+}
+module.exports = {localLogin, localSignup}

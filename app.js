@@ -9,15 +9,17 @@ const passport = require('passport')
 // const passportSetup = require('./passport')
 const passportSetupStrategy = require('./passport-google')
 const authRouter = require('./routers/authRouter')
+const movieRouter = require('./routers/movieRouter')
+
 const errorHandlerMiddleware = require('./middleware/error-handler')
 const notFoundMiddleware = require('./middleware/not-found')
 
 const app  = express()
-app.use(cookieSession({name: 'session', keys: [process.env.SESSION_KEY] ,maxAge: 24 * 60 * 60 * 1000}))
+app.use(cookieSession({name: 'session', keys: [process.env.SESSION_KEY], maxAge: 24 * 60 * 60 * 1000}))
 app.use(cors({
     origin: 'http://localhost:3000',
     credentials: true,
-    methods: 'GET,PUT,POST,PATCH'
+    methods: 'GET,PUT,POST,PATCH,DELETE'
 }))
 
 // set encoding middleware
@@ -30,12 +32,13 @@ app.use(passport.session())
 
 // routers
 app.use('/auth', authRouter)
+app.use('/favorite', movieRouter)
 
 // other middlewares
 app.use(errorHandlerMiddleware)
 app.use(notFoundMiddleware)
 
-const mongoURI = process.env.MONGO_URI
+const mongoURI = process.env.SERVER === 'production'? process.env.MONGO_URI : 'mongodb://127.0.0.1:27017/movie-app'
 
 const startServer = async() => {
     try {

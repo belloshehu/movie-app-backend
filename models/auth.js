@@ -26,14 +26,14 @@ const UserSchema = new mongoose.Schema({
     facebookID: String
 })
 
-UserSchema.pre('save', async(next)=>{
+UserSchema.pre('save', async function(next){
+    console.log(this.password)
     if (!this.password){
         return
-    }else{
+    }
         const salt = await bcrypt.genSalt(10)
         this.password = await bcrypt.hash(this.password, salt)
         next()
-    }
 })
 
 UserSchema.methods.getJWT = function(){
@@ -45,7 +45,7 @@ UserSchema.methods.getJWT = function(){
     return token
 }
 
-UserSchema.methods.comparePassword =async (userPassword)=>{
+UserSchema.methods.comparePassword = async function(userPassword){
     const isMatch = await bcrypt.compare(userPassword, this.password)
     return isMatch
 }
