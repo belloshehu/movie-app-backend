@@ -17,7 +17,7 @@ const notFoundMiddleware = require('./middleware/not-found')
 const app  = express()
 app.use(cookieSession({name: 'session', keys: [process.env.SESSION_KEY], maxAge: 24 * 60 * 60 * 1000}))
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'https://movie-app-belloshehu.vercel.app/'],
     credentials: true,
     methods: 'GET,PUT,POST,PATCH,DELETE'
 }))
@@ -31,6 +31,9 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 // routers
+app.get('/', async(req, res)=>{
+    res.send('Welcome to favoriteMovies home page')
+})
 app.use('/auth', authRouter)
 app.use('/favorite', movieRouter)
 
