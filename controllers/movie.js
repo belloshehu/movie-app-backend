@@ -41,7 +41,6 @@ const getAllFavorites = async (req, res) => {
 
 const deleteFavoriteMovie = async (req, res) =>{
     const {id} = req.params
-    console.log('removing...', id)
     const movie = await MovieModel.findOneAndDelete({_id: id, user: req.user.userID})
 
     if(!movie){

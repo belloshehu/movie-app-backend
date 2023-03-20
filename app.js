@@ -43,10 +43,12 @@ app.use(notFoundMiddleware)
 
 const mongoURI = process.env.SERVER === 'production'? process.env.MONGO_URI : 'mongodb://127.0.0.1:27017/movie-app'
 
+const port  = process.env.PORT || 8000
+
 const startServer = async() => {
     try {
         await connectDB(mongoURI)
-        app.listen('5000', async() => {
+        app.listen(port, async() => {
             console.log('Server listening on port 5000')
         })
     } catch (error) {
